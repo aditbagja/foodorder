@@ -10,4 +10,6 @@ import com.orderapp.foodorder.model.mongoDb.UsersMongo;
 
 public interface CartMongoRespository extends MongoRepository<CartMongo, Long> {
     Optional<CartMongo> findByUserAndResto(UsersMongo user, RestaurantMongo resto);
+
+    Optional<CartMongo> findAllByUser_Id(Long userId);
 }

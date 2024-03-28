@@ -13,11 +13,13 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "\"order\"")
 @EntityListeners(AuditingEntityListener.class)
 public class Order {
     @Id
-    @Column(name = "order_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_order_order_id_seq")
+    @SequenceGenerator(name = "generator_order_order_id_seq", sequenceName = "order_order_id_seq", allocationSize = 1, initialValue = 1)
+    @Column(name = "order_id", unique = true, nullable = false)
     private Long orderId;
 
     @ManyToOne

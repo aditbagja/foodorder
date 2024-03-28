@@ -4,6 +4,16 @@
       "name": "spring.kafka.topic.name",
       "type": "java.lang.String",
       "description": "A description for 'spring.kafka.topic.name'"
+    },
+    {
+      "name": "spring.kafka.topic.user",
+      "type": "java.lang.String",
+      "description": "A description for 'spring.kafka.topic.user'"
+    },
+    {
+      "name": "spring.kafka.topic.order",
+      "type": "java.lang.String",
+      "description": "A description for 'spring.kafka.topic.order'"
     }
   ]
 }

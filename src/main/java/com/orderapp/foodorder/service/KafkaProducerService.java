@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.orderapp.foodorder.model.mongoDb.OrderMongo;
 import com.orderapp.foodorder.model.mongoDb.UsersMongo;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,15 +18,29 @@ public class KafkaProducerService {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    @Value("${spring.kafka.topic.name}")
-    String kafkaTopic;
+    @Value("${spring.kafka.topic.user}")
+    String kafkaTopicUser;
+
+    @Value("${spring.kafka.topic.order}")
+    String kafkaTopicOrder;
 
     public void sendUserData(UsersMongo users) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String json = mapper.writeValueAsString(users);
             log.info("Sending User Data...");
-            kafkaTemplate.send(kafkaTopic, json);
+            kafkaTemplate.send(kafkaTopicUser, json);
+        } catch (JsonProcessingException e) {
+            log.error("Error serializing Data object to JSON:", e);
+        }
+    }
+
+    public void sendOrderData(OrderMongo order) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writeValueAsString(order);
+            log.info("Sending Order Data...");
+            kafkaTemplate.send(kafkaTopicOrder, json);
         } catch (JsonProcessingException e) {
             log.error("Error serializing Data object to JSON:", e);
         }

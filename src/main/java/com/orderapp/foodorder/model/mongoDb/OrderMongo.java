@@ -1,12 +1,14 @@
 package com.orderapp.foodorder.model.mongoDb;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import com.orderapp.foodorder.model.mongoDb.CartMongo.MenusCartInfo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,8 +30,7 @@ public class OrderMongo {
     private Customer customer;
 
     @Field("order_date")
-    @Builder.Default
-    private LocalDateTime orderDate = LocalDateTime.now();
+    private Timestamp orderDate;
 
     @Field("total_harga")
     private int total;
@@ -42,6 +43,7 @@ public class OrderMongo {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Customer {
+        private Long id;
         private String username;
         private String fullname;
         private String alamat;
@@ -52,6 +54,7 @@ public class OrderMongo {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class OrderDetail {
-        private List<MenuMongo> menu;
+        private RestaurantMongo resto;
+        private List<MenusCartInfo> menu;
     }
 }

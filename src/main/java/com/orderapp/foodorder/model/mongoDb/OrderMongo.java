@@ -1,7 +1,6 @@
 package com.orderapp.foodorder.model.mongoDb;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -55,6 +54,6 @@ public class OrderMongo {
     @AllArgsConstructor
     public static class OrderDetail {
         private RestaurantMongo resto;
-        private List<MenusCartInfo> menu;
+        private MenusCartInfo menu;
     }
 }

@@ -12,7 +12,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orderapp.foodorder.model.mongoDb.OrderMongo;
 import com.orderapp.foodorder.model.mongoDb.UsersMongo;
-import com.orderapp.foodorder.model.mongoDb.CartMongo.MenusCartInfo;
 import com.orderapp.foodorder.model.postgresql.Menu;
 import com.orderapp.foodorder.model.postgresql.Order;
 import com.orderapp.foodorder.model.postgresql.Restaurant;
@@ -74,24 +73,23 @@ public class KafkaConsumerService {
             Optional<Users> users = usersRepository.findById(ordersMongo.getCustomer().getId());
             Optional<Restaurant> resto = restaurantRepository.findById(ordersMongo.getDetail().getResto().getId());
 
-            for (MenusCartInfo menu : ordersMongo.getDetail().getMenu()) {
-                Optional<Menu> menus = menuRepository.findById(menu.getId());
+            Optional<Menu> menus = menuRepository.findById(ordersMongo.getDetail().getMenu().getId());
 
-                log.info("data menu by id..." + menus.get());
+            log.info("data menu by id..." + menus.get());
 
-                Order newOrder = Order.builder()
-                        .user(users.get())
-                        .resto(resto.get())
-                        .menu(menus.get())
-                        .orderDate(ordersMongo.getOrderDate())
-                        .quantity(menu.getQuantity())
-                        .totalHarga(menu.getHarga() * menu.getQuantity())
-                        .status(ordersMongo.getStatus())
-                        .createdTime(ordersMongo.getOrderDate())
-                        .build();
+            Order newOrder = Order.builder()
+                    .user(users.get())
+                    .resto(resto.get())
+                    .menu(menus.get())
+                    .orderDate(ordersMongo.getOrderDate())
+                    .quantity(ordersMongo.getDetail().getMenu().getQuantity())
+                    .totalHarga(ordersMongo.getDetail().getMenu().getHarga()
+                            * ordersMongo.getDetail().getMenu().getQuantity())
+                    .status(ordersMongo.getStatus())
+                    .createdTime(ordersMongo.getOrderDate())
+                    .build();
 
-                orderRepository.save(newOrder);
-            }
+            orderRepository.save(newOrder);
 
             log.info("Berhasil save data order ke OLAP PostgreSQL");
         } catch (JsonProcessingException e) {

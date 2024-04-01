@@ -1,6 +1,5 @@
 package com.orderapp.foodorder.model.mongoDb;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -30,7 +29,7 @@ public class OrderMongo {
     private Customer customer;
 
     @Field("order_date")
-    private Timestamp orderDate;
+    private String orderDate;
 
     @Field("total_harga")
     private int total;

@@ -83,11 +83,11 @@ public class KafkaConsumerService {
                         .user(users.get())
                         .resto(resto.get())
                         .menu(menus.get())
-                        .orderDate(ordersMongo.getOrderDate())
+                        .orderDate(Timestamp.valueOf(ordersMongo.getOrderDate()))
                         .quantity(menu.getQuantity())
                         .totalHarga(menu.getHarga() * menu.getQuantity())
                         .status(ordersMongo.getStatus())
-                        .createdTime(ordersMongo.getOrderDate())
+                        .createdTime(Timestamp.valueOf(ordersMongo.getOrderDate()))
                         .build();
 
                 orderRepository.save(newOrder);

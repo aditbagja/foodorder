@@ -47,6 +47,7 @@ public class OrderService {
         private KafkaProducerService kafkaProducerService;
 
         private static final HttpStatus statusOk = HttpStatus.OK;
+        private static final String orderNotFoundMessage = "Data Order tidak ditemukan";
         private static final String orderSuccessMessage = "Berhasil memuat data Order";
 
         @Transactional
@@ -92,7 +93,7 @@ public class OrderService {
 
         public ResponseEntity<Object> updateOrder(OrderActionDTO request) {
                 OrderMongo orderMongo = orderMongoRepository.findById(request.getOrderId())
-                                .orElseThrow(() -> new DataNotFoundException("Data Order tidak ditemukan"));
+                                .orElseThrow(() -> new DataNotFoundException(orderNotFoundMessage));
                 log.info(orderMongo.getStatus());
                 if (orderMongo.getStatus().equals("Ongoing")) {
                         orderMongo.setStatus(request.getAction());
@@ -121,7 +122,7 @@ public class OrderService {
         public ResponseEntity<Object> getUserOrder(Long userId) {
                 List<OrderMongo> orderList = orderMongoRepository.findAllByCustomer_Id(userId);
                 if (orderList.isEmpty()) {
-                        throw new DataNotFoundException("Data Order tidak ditemukan");
+                        throw new DataNotFoundException(orderNotFoundMessage);
                 } else {
                         List<OrderListResponse> datas = orderList.stream().map(data -> new OrderListResponse(
                                         data.getId(),
@@ -148,7 +149,7 @@ public class OrderService {
 
         public ResponseEntity<Object> getOrderById(Long orderId) {
                 OrderMongo orderData = orderMongoRepository.findById(orderId)
-                                .orElseThrow(() -> new DataNotFoundException("Data Order tidak ditemukan"));
+                                .orElseThrow(() -> new DataNotFoundException(orderNotFoundMessage));
 
                 ResponseBodyDTO response = ResponseBodyDTO.builder()
                                 .total(1)
@@ -161,5 +162,25 @@ public class OrderService {
                 log.info(orderSuccessMessage);
 
                 return new ResponseEntity<>(response, statusOk);
+        }
+
+        public ResponseEntity<Object> getOngoingOrderByCustomerId(Long customerId) {
+                List<OrderMongo> orderList = orderMongoRepository.findOngoingOrderByCustomerId(customerId);
+
+                if (orderList.isEmpty()) {
+                        throw new DataNotFoundException(orderNotFoundMessage);
+                } else {
+                        ResponseBodyDTO response = ResponseBodyDTO.builder()
+                                        .total(orderList.size())
+                                        .data(orderList)
+                                        .message(orderSuccessMessage)
+                                        .code(statusOk.value())
+                                        .status(statusOk.getReasonPhrase())
+                                        .build();
+
+                        log.info(orderSuccessMessage);
+
+                        return new ResponseEntity<>(response, statusOk);
+                }
         }
 }

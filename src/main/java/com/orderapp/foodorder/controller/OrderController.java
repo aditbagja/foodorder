@@ -30,13 +30,18 @@ public class OrderController {
         return orderService.updateOrder(request);
     }
 
-    @GetMapping("/user-order")
+    @GetMapping("/order/users")
     public ResponseEntity<Object> getUserOrder(@RequestParam Long userId) {
         return orderService.getUserOrder(userId);
     }
 
-    @GetMapping("/user-order/{orderId}")
+    @GetMapping("/order/{orderId}")
     public ResponseEntity<Object> getOrderById(@PathVariable("orderId") Long orderId) {
         return orderService.getOrderById(orderId);
+    }
+
+    @GetMapping("/order/ongoing")
+    public ResponseEntity<Object> getOngoingOrderByCustomerId(@RequestParam Long customerId) {
+        return orderService.getOngoingOrderByCustomerId(customerId);
     }
 }

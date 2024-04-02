@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.orderapp.foodorder.dto.request.LoginRequestDTO;
 import com.orderapp.foodorder.dto.request.RegisterRequestDTO;
 import com.orderapp.foodorder.dto.response.MessageResponse;
+import com.orderapp.foodorder.dto.response.ResponseBodyDTO;
+import com.orderapp.foodorder.dto.response.UserInfoResponse;
 import com.orderapp.foodorder.exception.classes.AlreadyExistException;
 import com.orderapp.foodorder.exception.classes.BadRequestException;
 import com.orderapp.foodorder.model.mongoDb.UsersMongo;
@@ -91,13 +93,17 @@ public class UserService {
             throw new BadRequestException("Username atau password salah");
         } else {
             String message = "Berhasil Login dengan username " + request.getUsername();
-            MessageResponse response = MessageResponse.builder()
+
+            ResponseBodyDTO response = ResponseBodyDTO.builder()
+                    .total(1)
+                    .data(new UserInfoResponse(userExist.getId(), userExist.getUsername()))
                     .message(message)
                     .code(statusOk.value())
                     .status(statusOk.getReasonPhrase())
                     .build();
 
             log.info(message);
+
             return new ResponseEntity<>(response, statusOk);
         }
     }

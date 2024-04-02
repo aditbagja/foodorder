@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.orderapp.foodorder.dto.request.OrderActionDTO;
 import com.orderapp.foodorder.dto.response.MessageResponse;
 import com.orderapp.foodorder.dto.response.ResponseBodyDTO;
+import com.orderapp.foodorder.exception.classes.BadRequestException;
 import com.orderapp.foodorder.exception.classes.DataNotFoundException;
 import com.orderapp.foodorder.model.mongoDb.CartMongo;
 import com.orderapp.foodorder.model.mongoDb.OrderMongo;
@@ -88,23 +89,28 @@ public class OrderService {
         public ResponseEntity<Object> updateOrder(OrderActionDTO request) {
                 OrderMongo orderMongo = orderMongoRepository.findById(request.getOrderId())
                                 .orElseThrow(() -> new DataNotFoundException("Data Order tidak ditemukan"));
-                orderMongo.setStatus(request.getAction());
-                orderMongoRepository.save(orderMongo);
-                // kafkaProducerService.sendOrderData(orderMongo);
+                log.info(orderMongo.getStatus());
+                if (orderMongo.getStatus().equals("Ongoing")) {
+                        orderMongo.setStatus(request.getAction());
+                        orderMongoRepository.save(orderMongo);
+                        kafkaProducerService.sendOrderData(orderMongo);
 
-                log.info("data order is = " + orderMongo.toString());
+                        log.info("Data orders = " + orderMongo);
 
-                String message = "Berhasil mengubah status Order (" + request.getAction() + ") untuk Order user: "
-                                + orderMongo.getCustomer().getFullname();
+                        String message = "Berhasil mengubah status Order (" + request.getAction()
+                                        + ") untuk Order user: "
+                                        + orderMongo.getCustomer().getFullname();
 
-                MessageResponse response = MessageResponse.builder()
-                                .message(message)
-                                .code(statusOk.value())
-                                .status(statusOk.getReasonPhrase())
-                                .build();
+                        MessageResponse response = MessageResponse.builder()
+                                        .message(message)
+                                        .code(statusOk.value())
+                                        .status(statusOk.getReasonPhrase())
+                                        .build();
 
-                log.info(message);
-
-                return new ResponseEntity<>(response, statusOk);
+                        log.info(message);
+                        return new ResponseEntity<>(response, statusOk);
+                } else {
+                        throw new BadRequestException("Anda tidak bisa mengubah Order yang sudah selesai");
+                }
         }
 }

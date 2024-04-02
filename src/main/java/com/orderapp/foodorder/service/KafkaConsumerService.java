@@ -2,6 +2,7 @@ package com.orderapp.foodorder.service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,29 +72,43 @@ public class KafkaConsumerService {
         try {
             OrderMongo ordersMongo = mapper.readValue(orderData, OrderMongo.class);
 
-            Optional<Users> users = usersRepository.findById(ordersMongo.getCustomer().getId());
-            Optional<Restaurant> resto = restaurantRepository.findById(ordersMongo.getDetail().getResto().getId());
+            List<Order> orderExist = orderRepository.findAllByOrderDate(Timestamp.valueOf(ordersMongo.getOrderDate()));
 
-            for (MenusCartInfo menu : ordersMongo.getDetail().getMenu()) {
-                Optional<Menu> menus = menuRepository.findById(menu.getId());
+            if (orderExist.isEmpty()) {
+                Optional<Users> users = usersRepository.findById(ordersMongo.getCustomer().getId());
+                Optional<Restaurant> resto = restaurantRepository.findById(ordersMongo.getDetail().getResto().getId());
 
-                log.info("data menu by id..." + menus.get());
+                for (MenusCartInfo menu : ordersMongo.getDetail().getMenu()) {
+                    Optional<Menu> menus = menuRepository.findById(menu.getId());
 
-                Order newOrder = Order.builder()
-                        .user(users.get())
-                        .resto(resto.get())
-                        .menu(menus.get())
-                        .orderDate(Timestamp.valueOf(ordersMongo.getOrderDate()))
-                        .quantity(menu.getQuantity())
-                        .totalHarga(menu.getHarga() * menu.getQuantity())
-                        .status(ordersMongo.getStatus())
-                        .createdTime(Timestamp.valueOf(ordersMongo.getOrderDate()))
-                        .build();
+                    log.info("data menu by id..." + menus.get());
 
-                orderRepository.save(newOrder);
+                    Order newOrder = Order.builder()
+                            .user(users.get())
+                            .resto(resto.get())
+                            .menu(menus.get())
+                            .orderDate(Timestamp.valueOf(ordersMongo.getOrderDate()))
+                            .quantity(menu.getQuantity())
+                            .totalHarga(menu.getHarga() * menu.getQuantity())
+                            .status(ordersMongo.getStatus())
+                            .createdTime(Timestamp.valueOf(ordersMongo.getOrderDate()))
+                            .build();
+
+                    orderRepository.save(newOrder);
+                }
+
+                log.info("Berhasil save data order ke OLAP PostgreSQL");
+            } else {
+                log.info("Order data from OLAP PostgreSQL " + orderExist);
+
+                for (Order order : orderExist) {
+                    order.setStatus(ordersMongo.getStatus());
+                    order.setModifiedTime(Timestamp.valueOf(LocalDateTime.now()));
+                    orderRepository.save(order);
+                }
+
+                log.info("Berhasil mengubah status (" + ordersMongo.getStatus() + ") OLAP PostgreSQL");
             }
-
-            log.info("Berhasil save data order ke OLAP PostgreSQL");
         } catch (JsonProcessingException e) {
             log.error("Error Getting User Data: ", e);
         }

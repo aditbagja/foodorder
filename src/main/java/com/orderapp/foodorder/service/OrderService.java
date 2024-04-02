@@ -2,6 +2,7 @@ package com.orderapp.foodorder.service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import com.orderapp.foodorder.dto.request.OrderActionDTO;
 import com.orderapp.foodorder.dto.response.MessageResponse;
+import com.orderapp.foodorder.dto.response.OrderListResponse;
 import com.orderapp.foodorder.dto.response.ResponseBodyDTO;
+import com.orderapp.foodorder.dto.response.MenuListResponse.RestoInfo;
 import com.orderapp.foodorder.exception.classes.BadRequestException;
 import com.orderapp.foodorder.exception.classes.DataNotFoundException;
 import com.orderapp.foodorder.model.mongoDb.CartMongo;
@@ -44,6 +47,7 @@ public class OrderService {
         private KafkaProducerService kafkaProducerService;
 
         private static final HttpStatus statusOk = HttpStatus.OK;
+        private static final String orderSuccessMessage = "Berhasil memuat data Order";
 
         @Transactional
         public ResponseEntity<Object> createOrder(Long userId) {
@@ -112,5 +116,50 @@ public class OrderService {
                 } else {
                         throw new BadRequestException("Anda tidak bisa mengubah Order yang sudah selesai");
                 }
+        }
+
+        public ResponseEntity<Object> getUserOrder(Long userId) {
+                List<OrderMongo> orderList = orderMongoRepository.findAllByCustomer_Id(userId);
+                if (orderList.isEmpty()) {
+                        throw new DataNotFoundException("Data Order tidak ditemukan");
+                } else {
+                        List<OrderListResponse> datas = orderList.stream().map(data -> new OrderListResponse(
+                                        data.getId(),
+                                        new RestoInfo(data.getDetail().getResto().getId(),
+                                                        data.getDetail().getResto().getName(),
+                                                        data.getDetail().getResto().getAlamat(),
+                                                        data.getDetail().getResto().getTimeOpen()),
+                                        data.getStatus(), data.getTotal(), data.getQuantity(),
+                                        Timestamp.valueOf(data.getOrderDate()))).toList();
+
+                        ResponseBodyDTO response = ResponseBodyDTO.builder()
+                                        .total(orderList.size())
+                                        .data(datas)
+                                        .message(orderSuccessMessage)
+                                        .code(statusOk.value())
+                                        .status(statusOk.getReasonPhrase())
+                                        .build();
+
+                        log.info(orderSuccessMessage);
+
+                        return new ResponseEntity<>(response, statusOk);
+                }
+        }
+
+        public ResponseEntity<Object> getOrderById(Long orderId) {
+                OrderMongo orderData = orderMongoRepository.findById(orderId)
+                                .orElseThrow(() -> new DataNotFoundException("Data Order tidak ditemukan"));
+
+                ResponseBodyDTO response = ResponseBodyDTO.builder()
+                                .total(1)
+                                .data(orderData)
+                                .message(orderSuccessMessage)
+                                .code(statusOk.value())
+                                .status(statusOk.getReasonPhrase())
+                                .build();
+
+                log.info(orderSuccessMessage);
+
+                return new ResponseEntity<>(response, statusOk);
         }
 }

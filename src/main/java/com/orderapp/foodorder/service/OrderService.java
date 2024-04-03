@@ -5,15 +5,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.orderapp.foodorder.dto.request.OrderActionDTO;
+import com.orderapp.foodorder.dto.request.OrderFilterRequestDTO;
 import com.orderapp.foodorder.dto.response.MessageResponse;
+import com.orderapp.foodorder.dto.response.OrderHistoricalResponse;
 import com.orderapp.foodorder.dto.response.OrderListResponse;
 import com.orderapp.foodorder.dto.response.ResponseBodyDTO;
+import com.orderapp.foodorder.dto.response.MenuListResponse.Menus;
 import com.orderapp.foodorder.dto.response.MenuListResponse.RestoInfo;
+import com.orderapp.foodorder.dto.response.OrderHistoricalResponse.CustomerInfo;
 import com.orderapp.foodorder.exception.classes.BadRequestException;
 import com.orderapp.foodorder.exception.classes.DataNotFoundException;
 import com.orderapp.foodorder.model.mongoDb.CartMongo;
@@ -21,8 +28,10 @@ import com.orderapp.foodorder.model.mongoDb.OrderMongo;
 import com.orderapp.foodorder.model.mongoDb.UsersMongo;
 import com.orderapp.foodorder.model.mongoDb.OrderMongo.Customer;
 import com.orderapp.foodorder.model.mongoDb.OrderMongo.OrderDetail;
+import com.orderapp.foodorder.model.postgresql.Order;
 import com.orderapp.foodorder.repository.CartMongoRespository;
 import com.orderapp.foodorder.repository.OrderMongoRepository;
+import com.orderapp.foodorder.repository.OrderRepository;
 import com.orderapp.foodorder.repository.UsersMongoRepository;
 
 import jakarta.transaction.Transactional;
@@ -33,6 +42,9 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderService {
         @Autowired
         private OrderMongoRepository orderMongoRepository;
+
+        @Autowired
+        private OrderRepository orderRepository;
 
         @Autowired
         private UsersMongoRepository usersMongoRepository;
@@ -173,6 +185,45 @@ public class OrderService {
                         ResponseBodyDTO response = ResponseBodyDTO.builder()
                                         .total(orderList.size())
                                         .data(orderList)
+                                        .message(orderSuccessMessage)
+                                        .code(statusOk.value())
+                                        .status(statusOk.getReasonPhrase())
+                                        .build();
+
+                        log.info(orderSuccessMessage);
+
+                        return new ResponseEntity<>(response, statusOk);
+                }
+        }
+
+        public ResponseEntity<Object> getHistoricalOrders(OrderFilterRequestDTO request, Pageable page) {
+                Specification<Order> orderSpecification = OrderSpecification.filterOrder(request);
+                Page<Order> orderData = orderRepository.findAll(orderSpecification, page);
+
+                if (orderData.isEmpty()) {
+                        throw new DataNotFoundException(orderNotFoundMessage);
+                } else {
+                        List<OrderHistoricalResponse> datas = orderData.stream()
+                                        .map(data -> new OrderHistoricalResponse(
+                                                        data.getOrderId(),
+                                                        new RestoInfo(data.getResto().getRestoId(),
+                                                                        data.getResto().getName(),
+                                                                        data.getResto().getAlamat(),
+                                                                        data.getResto().getTimeOpen()),
+                                                        new Menus(data.getMenu().getMenuId(), data.getMenu().getName(),
+                                                                        data.getMenu().getRating(),
+                                                                        data.getMenu().getLevel(),
+                                                                        data.getMenu().getHarga()),
+                                                        new CustomerInfo(data.getUser().getUserId(),
+                                                                        data.getUser().getFullname(),
+                                                                        data.getUser().getAlamat()),
+                                                        data.getStatus(), data.getTotalHarga(), data.getQuantity(),
+                                                        data.getOrderDate().toString()))
+                                        .toList();
+
+                        ResponseBodyDTO response = ResponseBodyDTO.builder()
+                                        .total((int) orderRepository.count(orderSpecification))
+                                        .data(datas)
                                         .message(orderSuccessMessage)
                                         .code(statusOk.value())
                                         .status(statusOk.getReasonPhrase())

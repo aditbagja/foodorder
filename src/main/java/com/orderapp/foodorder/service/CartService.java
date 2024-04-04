@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import com.orderapp.foodorder.dto.request.CartRequestDTO;
 import com.orderapp.foodorder.dto.response.CartListResponse;
 import com.orderapp.foodorder.dto.response.CartListResponse.MenusCartInfoDTO;
+import com.orderapp.foodorder.dto.response.MenuListResponse.RestoInfo;
+import com.orderapp.foodorder.dto.response.OrderHistoricalResponse.CustomerInfo;
 import com.orderapp.foodorder.dto.response.MessageResponse;
 import com.orderapp.foodorder.dto.response.ResponseBodyDTO;
 import com.orderapp.foodorder.exception.classes.DataNotFoundException;
@@ -152,14 +154,24 @@ public class CartService {
                                 .orElseThrow(() -> new DataNotFoundException("Data Cart tidak ditemukan"));
 
                 int totalMenus = cartData.getMenus().size();
+                int totalMakanan = cartData.getMenus().stream().mapToInt(data -> data.getQuantity()).sum();
+
                 List<MenusCartInfoDTO> menuList = cartData.getMenus().stream().map(data -> new MenusCartInfoDTO(
-                                data.getId(), data.getMenuName(), data.getLevel(), data.getHarga(), data.getQuantity()))
+                                data.getId(), data.getMenuName(), data.getLevel(), data.getHarga() * data.getQuantity(),
+                                data.getQuantity()))
                                 .toList();
 
                 CartListResponse dataResponse = CartListResponse.builder()
                                 .cartId(cartData.getId())
+                                .customer(new CustomerInfo(
+                                                cartData.getUser().getId(), cartData.getUser().getFullname(),
+                                                cartData.getUser().getAlamat()))
+                                .resto(new RestoInfo(
+                                                cartData.getResto().getId(), cartData.getResto().getName(),
+                                                cartData.getResto().getAlamat(), cartData.getResto().getTimeOpen()))
                                 .menus(menuList)
                                 .totalHarga(cartData.getTotalHarga())
+                                .totalMakanan(totalMakanan)
                                 .build();
 
                 ResponseBodyDTO response = ResponseBodyDTO.builder()

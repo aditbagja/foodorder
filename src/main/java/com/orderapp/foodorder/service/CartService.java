@@ -84,7 +84,7 @@ public class CartService {
 
                         cartExist.get().setTotalHarga(
                                         cartExist.get().getMenus().stream()
-                                                        .mapToInt(m -> m.getHarga() * m.getQuantity()).sum());
+                                                        .mapToInt(m -> m.getHarga()).sum());
 
                         cartMongoRespository.save(cartExist.get());
                 } else {

@@ -1,6 +1,8 @@
 package com.orderapp.foodorder.dto.request;
 
-import java.sql.Date;
+import java.time.LocalDate;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,5 +16,7 @@ public class OrderFilterRequestDTO {
     private String restoName;
     private String menuName;
     private String status;
-    private Date orderDate;
+
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    private LocalDate orderDate;
 }

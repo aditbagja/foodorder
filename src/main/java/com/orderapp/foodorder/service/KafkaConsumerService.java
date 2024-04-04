@@ -89,7 +89,7 @@ public class KafkaConsumerService {
                             .menu(menus.get())
                             .orderDate(Timestamp.valueOf(ordersMongo.getOrderDate()))
                             .quantity(menu.getQuantity())
-                            .totalHarga(menu.getHarga() * menu.getQuantity())
+                            .totalHarga(menu.getHarga())
                             .status(ordersMongo.getStatus())
                             .createdTime(Timestamp.valueOf(ordersMongo.getOrderDate()))
                             .build();

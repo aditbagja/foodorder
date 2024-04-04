@@ -142,7 +142,7 @@ public class OrderService {
                                                         data.getDetail().getResto().getName(),
                                                         data.getDetail().getResto().getAlamat(),
                                                         data.getDetail().getResto().getTimeOpen()),
-                                        data.getStatus(), data.getTotal(), data.getQuantity(),
+                                        data.getStatus(), data.getTotal(), data.getDetail().getMenu().size(),
                                         Timestamp.valueOf(data.getOrderDate()))).toList();
 
                         ResponseBodyDTO response = ResponseBodyDTO.builder()

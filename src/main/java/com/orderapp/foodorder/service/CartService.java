@@ -77,6 +77,7 @@ public class CartService {
                                 MenusCartInfo existingMenu = cartExist.get().getMenus().stream()
                                                 .filter(data -> data.getId().equals(menu.getId())).findFirst().get();
                                 existingMenu.setQuantity(existingMenu.getQuantity() + 1);
+                                existingMenu.setHarga(menu.getHarga() * existingMenu.getQuantity());
                         } else {
                                 cartExist.get().getMenus().add(newMenus);
                         }
@@ -157,7 +158,7 @@ public class CartService {
                 int totalMakanan = cartData.getMenus().stream().mapToInt(data -> data.getQuantity()).sum();
 
                 List<MenusCartInfoDTO> menuList = cartData.getMenus().stream().map(data -> new MenusCartInfoDTO(
-                                data.getId(), data.getMenuName(), data.getLevel(), data.getHarga() * data.getQuantity(),
+                                data.getId(), data.getMenuName(), data.getLevel(), data.getHarga(),
                                 data.getQuantity()))
                                 .toList();
 

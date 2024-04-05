@@ -7,12 +7,12 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.orderapp.foodorder.dto.request.OrderFilterRequestDTO;
-import com.orderapp.foodorder.model.postgresql.Order;
+import com.orderapp.foodorder.model.postgresql.Orders;
 
 import jakarta.persistence.criteria.Predicate;
 
 public class OrderSpecification {
-    public static Specification<Order> filterOrder(OrderFilterRequestDTO request) {
+    public static Specification<Orders> filterOrder(OrderFilterRequestDTO request) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 

@@ -17,10 +17,12 @@ import com.orderapp.foodorder.dto.request.OrderFilterRequestDTO;
 import com.orderapp.foodorder.dto.response.MessageResponse;
 import com.orderapp.foodorder.dto.response.OrderHistoricalResponse;
 import com.orderapp.foodorder.dto.response.OrderListResponse;
+import com.orderapp.foodorder.dto.response.OrderStatisticResponse;
 import com.orderapp.foodorder.dto.response.ResponseBodyDTO;
 import com.orderapp.foodorder.dto.response.MenuListResponse.Menus;
 import com.orderapp.foodorder.dto.response.MenuListResponse.RestoInfo;
 import com.orderapp.foodorder.dto.response.OrderHistoricalResponse.CustomerInfo;
+import com.orderapp.foodorder.dto.response.OrderStatisticResponse.OrderByStatus;
 import com.orderapp.foodorder.exception.classes.BadRequestException;
 import com.orderapp.foodorder.exception.classes.DataNotFoundException;
 import com.orderapp.foodorder.model.mongoDb.CartMongo;
@@ -28,7 +30,7 @@ import com.orderapp.foodorder.model.mongoDb.OrderMongo;
 import com.orderapp.foodorder.model.mongoDb.UsersMongo;
 import com.orderapp.foodorder.model.mongoDb.OrderMongo.Customer;
 import com.orderapp.foodorder.model.mongoDb.OrderMongo.OrderDetail;
-import com.orderapp.foodorder.model.postgresql.Order;
+import com.orderapp.foodorder.model.postgresql.Orders;
 import com.orderapp.foodorder.repository.CartMongoRespository;
 import com.orderapp.foodorder.repository.OrderMongoRepository;
 import com.orderapp.foodorder.repository.OrderRepository;
@@ -40,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class OrderService {
+
         @Autowired
         private OrderMongoRepository orderMongoRepository;
 
@@ -59,8 +62,11 @@ public class OrderService {
         private KafkaProducerService kafkaProducerService;
 
         private static final HttpStatus statusOk = HttpStatus.OK;
-        private static final String orderNotFoundMessage = "Data Order tidak ditemukan";
-        private static final String orderSuccessMessage = "Berhasil memuat data Order";
+        private static final String ORDER_NOT_FOUND = "Data Order tidak ditemukan";
+        private static final String ORDER_SUCCESS = "Berhasil memuat data Order";
+        private static final String ONGOING = "Ongoing";
+        private static final String COMPLETED = "Completed";
+        private static final String CANCELLED = "Cancelled";
 
         @Transactional
         public ResponseEntity<Object> createOrder(Long userId) {
@@ -77,7 +83,7 @@ public class OrderService {
                                 .orderDate(Timestamp.valueOf(LocalDateTime.now()).toString())
                                 .total(cartInfo.getTotalHarga())
                                 .quantity(quantity)
-                                .status("Ongoing")
+                                .status(ONGOING)
                                 .detail(OrderDetail.builder()
                                                 .resto(cartInfo.getResto())
                                                 .menu(cartInfo.getMenus())
@@ -105,9 +111,9 @@ public class OrderService {
 
         public ResponseEntity<Object> updateOrder(OrderActionDTO request) {
                 OrderMongo orderMongo = orderMongoRepository.findById(request.getOrderId())
-                                .orElseThrow(() -> new DataNotFoundException(orderNotFoundMessage));
+                                .orElseThrow(() -> new DataNotFoundException(ORDER_NOT_FOUND));
                 log.info(orderMongo.getStatus());
-                if (orderMongo.getStatus().equals("Ongoing")) {
+                if (orderMongo.getStatus().equals(ONGOING)) {
                         orderMongo.setStatus(request.getAction());
                         orderMongoRepository.save(orderMongo);
                         kafkaProducerService.sendOrderData(orderMongo);
@@ -134,7 +140,7 @@ public class OrderService {
         public ResponseEntity<Object> getUserOrder(Long userId) {
                 List<OrderMongo> orderList = orderMongoRepository.findAllByCustomer_Id(userId);
                 if (orderList.isEmpty()) {
-                        throw new DataNotFoundException(orderNotFoundMessage);
+                        throw new DataNotFoundException(ORDER_NOT_FOUND);
                 } else {
                         List<OrderListResponse> datas = orderList.stream().map(data -> new OrderListResponse(
                                         data.getId(),
@@ -148,12 +154,12 @@ public class OrderService {
                         ResponseBodyDTO response = ResponseBodyDTO.builder()
                                         .total(orderList.size())
                                         .data(datas)
-                                        .message(orderSuccessMessage)
+                                        .message(ORDER_SUCCESS)
                                         .code(statusOk.value())
                                         .status(statusOk.getReasonPhrase())
                                         .build();
 
-                        log.info(orderSuccessMessage);
+                        log.info(ORDER_SUCCESS);
 
                         return new ResponseEntity<>(response, statusOk);
                 }
@@ -161,17 +167,17 @@ public class OrderService {
 
         public ResponseEntity<Object> getOrderById(Long orderId) {
                 OrderMongo orderData = orderMongoRepository.findById(orderId)
-                                .orElseThrow(() -> new DataNotFoundException(orderNotFoundMessage));
+                                .orElseThrow(() -> new DataNotFoundException(ORDER_NOT_FOUND));
 
                 ResponseBodyDTO response = ResponseBodyDTO.builder()
                                 .total(1)
                                 .data(orderData)
-                                .message(orderSuccessMessage)
+                                .message(ORDER_SUCCESS)
                                 .code(statusOk.value())
                                 .status(statusOk.getReasonPhrase())
                                 .build();
 
-                log.info(orderSuccessMessage);
+                log.info(ORDER_SUCCESS);
 
                 return new ResponseEntity<>(response, statusOk);
         }
@@ -180,28 +186,28 @@ public class OrderService {
                 List<OrderMongo> orderList = orderMongoRepository.findOngoingOrderByCustomerId(customerId);
 
                 if (orderList.isEmpty()) {
-                        throw new DataNotFoundException(orderNotFoundMessage);
+                        throw new DataNotFoundException(ORDER_NOT_FOUND);
                 } else {
                         ResponseBodyDTO response = ResponseBodyDTO.builder()
                                         .total(orderList.size())
                                         .data(orderList)
-                                        .message(orderSuccessMessage)
+                                        .message(ORDER_SUCCESS)
                                         .code(statusOk.value())
                                         .status(statusOk.getReasonPhrase())
                                         .build();
 
-                        log.info(orderSuccessMessage);
+                        log.info(ORDER_SUCCESS);
 
                         return new ResponseEntity<>(response, statusOk);
                 }
         }
 
         public ResponseEntity<Object> getHistoricalOrders(OrderFilterRequestDTO request, Pageable page) {
-                Specification<Order> orderSpecification = OrderSpecification.filterOrder(request);
-                Page<Order> orderData = orderRepository.findAll(orderSpecification, page);
+                Specification<Orders> orderSpecification = OrderSpecification.filterOrder(request);
+                Page<Orders> orderData = orderRepository.findAll(orderSpecification, page);
 
                 if (orderData.isEmpty()) {
-                        throw new DataNotFoundException(orderNotFoundMessage);
+                        throw new DataNotFoundException(ORDER_NOT_FOUND);
                 } else {
                         List<OrderHistoricalResponse> datas = orderData.stream()
                                         .map(data -> new OrderHistoricalResponse(
@@ -224,14 +230,29 @@ public class OrderService {
                         ResponseBodyDTO response = ResponseBodyDTO.builder()
                                         .total((int) orderRepository.count(orderSpecification))
                                         .data(datas)
-                                        .message(orderSuccessMessage)
+                                        .message(ORDER_SUCCESS)
                                         .code(statusOk.value())
                                         .status(statusOk.getReasonPhrase())
                                         .build();
 
-                        log.info(orderSuccessMessage);
+                        log.info(ORDER_SUCCESS);
 
                         return new ResponseEntity<>(response, statusOk);
                 }
+        }
+
+        public ResponseEntity<Object> getOrderStatistic() {
+                long totalOrders = orderRepository.count();
+                long totalOngoingOrders = orderRepository.countByStatus(ONGOING);
+                long totalCompletedOrders = orderRepository.countByStatus(COMPLETED);
+                long totalCancelledOrders = orderRepository.countByStatus(CANCELLED);
+
+                OrderStatisticResponse response = OrderStatisticResponse.builder()
+                                .totalOrders(totalOrders)
+                                .orderByStatus(new OrderByStatus(
+                                                totalOngoingOrders, totalCompletedOrders, totalCancelledOrders))
+                                .build();
+
+                return new ResponseEntity<>(response, statusOk);
         }
 }

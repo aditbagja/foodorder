@@ -13,9 +13,9 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "\"order\"")
+@Entity
 @EntityListeners(AuditingEntityListener.class)
-public class Order {
+public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_order_order_id_seq")
     @SequenceGenerator(name = "generator_order_order_id_seq", sequenceName = "order_order_id_seq", allocationSize = 1, initialValue = 1)

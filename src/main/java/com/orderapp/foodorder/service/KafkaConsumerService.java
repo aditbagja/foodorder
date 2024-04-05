@@ -15,7 +15,7 @@ import com.orderapp.foodorder.model.mongoDb.OrderMongo;
 import com.orderapp.foodorder.model.mongoDb.UsersMongo;
 import com.orderapp.foodorder.model.mongoDb.CartMongo.MenusCartInfo;
 import com.orderapp.foodorder.model.postgresql.Menu;
-import com.orderapp.foodorder.model.postgresql.Order;
+import com.orderapp.foodorder.model.postgresql.Orders;
 import com.orderapp.foodorder.model.postgresql.Restaurant;
 import com.orderapp.foodorder.model.postgresql.Users;
 import com.orderapp.foodorder.repository.MenuRepository;
@@ -72,7 +72,7 @@ public class KafkaConsumerService {
         try {
             OrderMongo ordersMongo = mapper.readValue(orderData, OrderMongo.class);
 
-            List<Order> orderExist = orderRepository.findAllByOrderDate(Timestamp.valueOf(ordersMongo.getOrderDate()));
+            List<Orders> orderExist = orderRepository.findAllByOrderDate(Timestamp.valueOf(ordersMongo.getOrderDate()));
 
             if (orderExist.isEmpty()) {
                 Optional<Users> users = usersRepository.findById(ordersMongo.getCustomer().getId());
@@ -83,7 +83,7 @@ public class KafkaConsumerService {
 
                     log.info("data menu by id..." + menus.get());
 
-                    Order newOrder = Order.builder()
+                    Orders newOrder = Orders.builder()
                             .user(users.get())
                             .resto(resto.get())
                             .menu(menus.get())
@@ -101,7 +101,7 @@ public class KafkaConsumerService {
             } else {
                 log.info("Order data from OLAP PostgreSQL " + orderExist);
 
-                for (Order order : orderExist) {
+                for (Orders order : orderExist) {
                     order.setStatus(ordersMongo.getStatus());
                     order.setModifiedTime(Timestamp.valueOf(LocalDateTime.now()));
                     orderRepository.save(order);

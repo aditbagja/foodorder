@@ -55,4 +55,9 @@ public class OrderController {
             @PageableDefault(page = 1, sort = "orderDate", direction = Direction.DESC) Pageable page) {
         return orderService.getHistoricalOrders(request, page);
     }
+
+    @GetMapping("/order/statistics")
+    public ResponseEntity<Object> getStatisticOrders(){
+        return orderService.getOrderStatistic();
+    }
 }

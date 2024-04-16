@@ -14,11 +14,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orderapp.foodorder.model.mongoDb.OrderMongo;
 import com.orderapp.foodorder.model.mongoDb.UsersMongo;
 import com.orderapp.foodorder.model.mongoDb.CartMongo.MenusCartInfo;
-import com.orderapp.foodorder.model.postgresql.Menu;
 import com.orderapp.foodorder.model.postgresql.Orders;
 import com.orderapp.foodorder.model.postgresql.Restaurant;
 import com.orderapp.foodorder.model.postgresql.Users;
-import com.orderapp.foodorder.repository.MenuRepository;
 import com.orderapp.foodorder.repository.OrderRepository;
 import com.orderapp.foodorder.repository.RestaurantRepository;
 import com.orderapp.foodorder.repository.UsersRepository;
@@ -36,9 +34,6 @@ public class KafkaConsumerService {
 
     @Autowired
     private RestaurantRepository restaurantRepository;
-
-    @Autowired
-    private MenuRepository menuRepository;
 
     @KafkaListener(topics = "${spring.kafka.topic.user}", groupId = "user")
     public void consumeDataUser(String users) {
@@ -71,41 +66,35 @@ public class KafkaConsumerService {
         ObjectMapper mapper = new ObjectMapper();
         try {
             OrderMongo ordersMongo = mapper.readValue(orderData, OrderMongo.class);
+            Optional<Orders> orderExistData = orderRepository.findById(ordersMongo.getId());
 
-            List<Orders> orderExist = orderRepository.findAllByOrderDate(Timestamp.valueOf(ordersMongo.getOrderDate()));
-
-            if (orderExist.isEmpty()) {
+            if (orderExistData.isEmpty()) {
                 Optional<Users> users = usersRepository.findById(ordersMongo.getCustomer().getId());
                 Optional<Restaurant> resto = restaurantRepository.findById(ordersMongo.getDetail().getResto().getId());
 
-                for (MenusCartInfo menu : ordersMongo.getDetail().getMenu()) {
-                    Optional<Menu> menus = menuRepository.findById(menu.getId());
+                List<String> listMenu = ordersMongo.getDetail().getMenu().stream().map(MenusCartInfo::getMenuName)
+                        .toList();
 
-                    log.info("data menu by id..." + menus.get());
+                Orders newOrder = Orders.builder()
+                        .orderId(ordersMongo.getId())
+                        .user(users.get())
+                        .resto(resto.get())
+                        .menuName(listMenu)
+                        .orderDate(Timestamp.valueOf(ordersMongo.getOrderDate()))
+                        .quantity(ordersMongo.getQuantity())
+                        .totalHarga(ordersMongo.getTotal())
+                        .status(ordersMongo.getStatus())
+                        .createdTime(Timestamp.valueOf(ordersMongo.getOrderDate()))
+                        .build();
 
-                    Orders newOrder = Orders.builder()
-                            .user(users.get())
-                            .resto(resto.get())
-                            .menu(menus.get())
-                            .orderDate(Timestamp.valueOf(ordersMongo.getOrderDate()))
-                            .quantity(menu.getQuantity())
-                            .totalHarga(menu.getHarga())
-                            .status(ordersMongo.getStatus())
-                            .createdTime(Timestamp.valueOf(ordersMongo.getOrderDate()))
-                            .build();
-
-                    orderRepository.save(newOrder);
-                }
+                orderRepository.save(newOrder);
 
                 log.info("Berhasil save data order ke OLAP PostgreSQL");
             } else {
-                log.info("Order data from OLAP PostgreSQL " + orderExist);
-
-                for (Orders order : orderExist) {
-                    order.setStatus(ordersMongo.getStatus());
-                    order.setModifiedTime(Timestamp.valueOf(LocalDateTime.now()));
-                    orderRepository.save(order);
-                }
+                log.info("Order data from OLAP PostgreSQL " + orderExistData);
+                orderExistData.get().setStatus(ordersMongo.getStatus());
+                orderExistData.get().setModifiedTime(Timestamp.valueOf(LocalDateTime.now()));
+                orderRepository.save(orderExistData.get());
 
                 log.info("Berhasil mengubah status (" + ordersMongo.getStatus() + ") OLAP PostgreSQL");
             }

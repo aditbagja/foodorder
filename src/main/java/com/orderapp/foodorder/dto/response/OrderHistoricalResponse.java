@@ -1,6 +1,7 @@
 package com.orderapp.foodorder.dto.response;
 
-import com.orderapp.foodorder.dto.response.MenuListResponse.Menus;
+import java.util.List;
+
 import com.orderapp.foodorder.dto.response.MenuListResponse.RestoInfo;
 
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class OrderHistoricalResponse {
     private Long orderId;
     private RestoInfo resto;
-    private Menus menu;
+    private List<String> menus;
     private CustomerInfo customer;
     private String status;
     private int totalHarga;

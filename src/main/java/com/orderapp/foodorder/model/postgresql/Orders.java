@@ -1,6 +1,7 @@
 package com.orderapp.foodorder.model.postgresql;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -17,9 +18,7 @@ import lombok.*;
 @EntityListeners(AuditingEntityListener.class)
 public class Orders {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_order_order_id_seq")
-    @SequenceGenerator(name = "generator_order_order_id_seq", sequenceName = "order_order_id_seq", allocationSize = 1, initialValue = 1)
-    @Column(name = "order_id", unique = true, nullable = false)
+    @Column(name = "order_id", nullable = false)
     private Long orderId;
 
     @ManyToOne
@@ -30,9 +29,8 @@ public class Orders {
     @JoinColumn(name = "resto_id")
     private Restaurant resto;
 
-    @ManyToOne
-    @JoinColumn(name = "menu_id")
-    private Menu menu;
+    @Column(columnDefinition = "_varchar")
+    private List<String> menuName;
 
     @Column(name = "order_date")
     private Timestamp orderDate;

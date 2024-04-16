@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 public class OrderFilterRequestDTO {
     private String customerName;
     private String restoName;
-    private String menuName;
     private String status;
 
     @DateTimeFormat(pattern = "dd-MM-yyyy")

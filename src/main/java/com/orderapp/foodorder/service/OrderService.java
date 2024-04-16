@@ -19,7 +19,6 @@ import com.orderapp.foodorder.dto.response.OrderHistoricalResponse;
 import com.orderapp.foodorder.dto.response.OrderListResponse;
 import com.orderapp.foodorder.dto.response.OrderStatisticResponse;
 import com.orderapp.foodorder.dto.response.ResponseBodyDTO;
-import com.orderapp.foodorder.dto.response.MenuListResponse.Menus;
 import com.orderapp.foodorder.dto.response.MenuListResponse.RestoInfo;
 import com.orderapp.foodorder.dto.response.OrderHistoricalResponse.CustomerInfo;
 import com.orderapp.foodorder.dto.response.OrderStatisticResponse.OrderByStatus;
@@ -64,6 +63,7 @@ public class OrderService {
         private static final HttpStatus statusOk = HttpStatus.OK;
         private static final String ORDER_NOT_FOUND = "Data Order tidak ditemukan";
         private static final String ORDER_SUCCESS = "Berhasil memuat data Order";
+        private static final String ORDER_STATISTIC = "Berhasil memuat data Statistic Order";
         private static final String ONGOING = "Ongoing";
         private static final String COMPLETED = "Completed";
         private static final String CANCELLED = "Cancelled";
@@ -216,10 +216,7 @@ public class OrderService {
                                                                         data.getResto().getName(),
                                                                         data.getResto().getAlamat(),
                                                                         data.getResto().getTimeOpen()),
-                                                        new Menus(data.getMenu().getMenuId(), data.getMenu().getName(),
-                                                                        data.getMenu().getRating(),
-                                                                        data.getMenu().getLevel(),
-                                                                        data.getMenu().getHarga()),
+                                                        data.getMenuName(),
                                                         new CustomerInfo(data.getUser().getUserId(),
                                                                         data.getUser().getFullname(),
                                                                         data.getUser().getAlamat()),
@@ -252,6 +249,8 @@ public class OrderService {
                                 .orderByStatus(new OrderByStatus(
                                                 totalOngoingOrders, totalCompletedOrders, totalCancelledOrders))
                                 .build();
+
+                log.info(ORDER_STATISTIC);
 
                 return new ResponseEntity<>(response, statusOk);
         }

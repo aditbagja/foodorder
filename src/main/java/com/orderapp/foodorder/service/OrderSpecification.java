@@ -28,12 +28,6 @@ public class OrderSpecification {
                 predicates.add(restoPredicate);
             }
 
-            if (request.getMenuName() != null) {
-                String searchValue = "%" + request.getMenuName() + "%";
-                Predicate menuPredicate = criteriaBuilder.like(root.get("menu").get("name"), searchValue);
-                predicates.add(menuPredicate);
-            }
-
             if (request.getStatus() != null) {
                 Predicate statusPredicate = criteriaBuilder.equal(root.get("status"), request.getStatus());
                 predicates.add(statusPredicate);
@@ -44,7 +38,6 @@ public class OrderSpecification {
                         criteriaBuilder.function("date", LocalDate.class, root.get("orderDate")),
                         request.getOrderDate());
                 predicates.add(requestDatePredicate);
-
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));

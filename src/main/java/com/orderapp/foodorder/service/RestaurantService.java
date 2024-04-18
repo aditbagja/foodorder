@@ -21,13 +21,14 @@ public class RestaurantService {
     RestaurantMongoRepository restaurantMongoRepository;
 
     private static final HttpStatus statusOk = HttpStatus.OK;
-    private static final String messageSuccess = "Berhasil memuat data Resto";
 
     public ResponseEntity<Object> getAllRestaurant() {
         List<RestaurantMongo> resto = restaurantMongoRepository.findAll();
         if (resto.isEmpty()) {
             throw new DataNotFoundException("Data Resto tidak ditemukan");
         }
+
+        String messageSuccess = "Berhasil memuat data Resto";
 
         ResponseBodyDTO response = ResponseBodyDTO.builder()
                 .total(resto.size())

@@ -24,7 +24,6 @@ public class MenuService {
     MenuMongoRepository menuMongoRepository;
 
     private static final HttpStatus statusOk = HttpStatus.OK;
-    private static final String messageSuccess = "Berhasil memuat data Menu";
 
     public ResponseEntity<Object> getMenuByRestoId(Long restoId) {
         List<MenuMongo> menus = menuMongoRepository.findAllByResto_Id(restoId);
@@ -42,6 +41,7 @@ public class MenuService {
                 data.getId(), data.getName(), data.getRating(), data.getLevel(), data.getHarga())).toList();
 
         MenuListResponse datas = new MenuListResponse(resto, menuList);
+        String messageSuccess = "Berhasil memuat data Menu";
 
         ResponseBodyDTO response = ResponseBodyDTO.builder()
                 .total(menus.size())

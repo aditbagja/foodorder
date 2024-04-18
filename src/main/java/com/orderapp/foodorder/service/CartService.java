@@ -134,7 +134,7 @@ public class CartService {
                                                 .mapToInt(m -> m.getHarga() * m.getQuantity()).sum());
                 cartMongoRespository.save(cartExist);
 
-                if (menuList.size() == 0) {
+                if (menuList.isEmpty()) {
                         cartMongoRespository.delete(cartExist);
                 }
 
@@ -155,7 +155,7 @@ public class CartService {
                                 .orElseThrow(() -> new DataNotFoundException("Data Cart tidak ditemukan"));
 
                 int totalMenus = cartData.getMenus().size();
-                int totalMakanan = cartData.getMenus().stream().mapToInt(data -> data.getQuantity()).sum();
+                int totalMakanan = cartData.getMenus().stream().mapToInt(MenusCartInfo::getQuantity).sum();
 
                 List<MenusCartInfoDTO> menuList = cartData.getMenus().stream().map(data -> new MenusCartInfoDTO(
                                 data.getId(), data.getMenuName(), data.getLevel(), data.getHarga(),

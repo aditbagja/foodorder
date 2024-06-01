@@ -1,0 +1,65 @@
+[{
+  "_id": 1,
+  "resto": {
+    "name": "Ayam Bakar Bandung",
+    "alamat": "Jl. Soekarno Hatta No. 10",
+    "time_open": "10:00 - 20:00",
+    "_id": 1
+  },
+  "name": "Ayam Goreng",
+  "rating": 4,
+  "harga": 10000,
+  "level": 4
+},
+{
+  "_id": 2,
+  "resto": {
+    "name": "Ayam Bakar Bandung",
+    "alamat": "Jl. Soekarno Hatta No. 10",
+    "time_open": "10:00 - 20:00",
+    "_id": 1
+  },
+  "name": "Ayam Geprek",
+  "rating": 3,
+  "harga": 15000,
+  "level": 5
+},
+{
+  "_id": 3,
+  "resto": {
+    "name": "Ayam Bakar Bandung",
+    "alamat": "Jl. Soekarno Hatta No. 10",
+    "time_open": "10:00 - 20:00",
+    "_id": 1
+  },
+  "name": "Ayam Bakar",
+  "rating": 3,
+  "harga": 30000,
+  "level": 3
+},
+{
+  "_id": 4,
+  "resto": {
+    "name": "Ayam Bakar Bandung",
+    "alamat": "Jl. Soekarno Hatta No. 10",
+    "time_open": "10:00 - 20:00",
+    "_id": 1
+  },
+  "name": "Ayam Crispy",
+  "rating": 5,
+  "harga": 8000,
+  "level": 4
+},
+{
+  "_id": 5,
+  "resto": {
+    "name": "Pusat Cemilan Bandung",
+    "alamat": "Jl. Cihampelas No. 10",
+    "time_open": "09:00 - 21:00",
+    "_id": 2
+  },
+  "name": "Keripik Singkong",
+  "rating": 5,
+  "harga": 5000,
+  "level": 2
+}]

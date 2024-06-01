@@ -1,0 +1,80 @@
+[{
+  "_id": 14,
+  "username": "user12",
+  "fullname": "User",
+  "alamat": "Bandung",
+  "password": "$2a$10$JvuO.9skd73AxV3f0va2Aum5njJcWIn0DqRkFs0zOrip911XesUZ6",
+  "_class": "com.orderapp.foodorder.model.mongoDb.UsersMongo"
+},
+{
+  "_id": 15,
+  "username": "user13",
+  "fullname": "User",
+  "alamat": "Bandung",
+  "password": "$2a$10$m6VixceXbUuaPwOl3puyXufMVMFhujvNYLx6tmtGkGNeYnfhDWgwK",
+  "_class": "com.orderapp.foodorder.model.mongoDb.UsersMongo"
+},
+{
+  "_id": 18,
+  "username": "ujangmaman",
+  "fullname": "Ujang",
+  "alamat": "Bandung",
+  "password": "$2a$10$5OBJX8MltVDcqNtVEp3.fOmrIlMP1SkP9sBINSO3K2Ms2M2YwIKSy",
+  "_class": "com.orderapp.foodorder.model.mongoDb.UsersMongo"
+},
+{
+  "_id": 19,
+  "username": "komeng",
+  "fullname": "Komeng",
+  "alamat": "Bandung",
+  "password": "$2a$10$4cYyc5b202y2i.Y2Br6C8OqicxljWsef1lRCuhH9aqBglhqVc/1Gu",
+  "_class": "com.orderapp.foodorder.model.mongoDb.UsersMongo"
+},
+{
+  "_id": 22,
+  "username": "komeng1",
+  "fullname": "Komeng Uhuyy",
+  "alamat": "Bandung",
+  "password": "$2a$10$FiznSZKI5BwTiZ2Lv5V1RuDvE8xWuQhT8nMhZe.Ai0fAWHOkUj.Ti",
+  "_class": "com.orderapp.foodorder.model.mongoDb.UsersMongo"
+},
+{
+  "_id": 24,
+  "username": "aduladul",
+  "fullname": "Adul Mini",
+  "alamat": "Jl. Pasteur No 99",
+  "password": "$2a$10$7eYAXDtpZ4vI0jEpMCzbgO.t.EgwmF4rV3Y6FgYjzLFNGo2HbiQXe",
+  "_class": "com.orderapp.foodorder.model.mongoDb.UsersMongo"
+},
+{
+  "_id": 25,
+  "username": "",
+  "fullname": "",
+  "alamat": "",
+  "password": "$2a$10$uzMvHBkhd0DCAtxroxmm9elNaQR1ECa40O0itEx0X.cWw3TKZImia",
+  "_class": "com.orderapp.foodorder.model.mongoDb.UsersMongo"
+},
+{
+  "_id": 26,
+  "username": "markus",
+  "fullname": "Markus Horizon",
+  "alamat": "Jl. Dago Atas No. 39",
+  "password": "$2a$10$wV0g6fyvcZCiZvB/QJUVJulFHf4wHtzKeJjP9jqwNZYnzu3ojVuim",
+  "_class": "com.orderapp.foodorder.model.mongoDb.UsersMongo"
+},
+{
+  "_id": 27,
+  "username": "userdummy",
+  "fullname": "Dummy User",
+  "alamat": "Jl. Unknown No. 0",
+  "password": "$2a$10$I8BE/.KNfaNvN6LcLwoA4uVLscZMGgNeD2lUATDLEZWfE1OjJhasK",
+  "_class": "com.orderapp.foodorder.model.mongoDb.UsersMongo"
+},
+{
+  "_id": 35,
+  "username": "andi",
+  "fullname": "Andi Hidayat",
+  "alamat": "Jl. Raya Banjaran No. 10",
+  "password": "$2a$10$/SJDj4BpULp/.uPGKouhzOP2DQMYUnMj4Re6AfUzKHFT3XdESlhfq",
+  "_class": "com.orderapp.foodorder.model.mongoDb.UsersMongo"
+}]

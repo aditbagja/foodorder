@@ -1,0 +1,12 @@
+[{
+  "_id": "users_sequence",
+  "seq": 36
+},
+{
+  "_id": "cart_sequence",
+  "seq": 43
+},
+{
+  "_id": "order_sequence",
+  "seq": 8
+}]

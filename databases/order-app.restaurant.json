@@ -1,0 +1,12 @@
+[{
+  "_id": 1,
+  "name": "Ayam Bakar Bandung",
+  "alamat": "Jl. Soekarno Hatta No. 10",
+  "time_open": "10:00 - 20:00"
+},
+{
+  "_id": 2,
+  "name": "Pusat Cemilan Bandung",
+  "alamat": "Jl. Cihampelas No. 10",
+  "time_open": "09:00 - 21:00"
+}]

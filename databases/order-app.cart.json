@@ -1,0 +1,28 @@
+[{
+  "_id": 40,
+  "user": {
+    "_id": 19,
+    "username": "komeng",
+    "fullname": "Komeng",
+    "alamat": "Bandung",
+    "password": "$2a$10$4cYyc5b202y2i.Y2Br6C8OqicxljWsef1lRCuhH9aqBglhqVc/1Gu"
+  },
+  "resto": {
+    "_id": 1,
+    "name": "Ayam Bakar Bandung",
+    "alamat": "Jl. Soekarno Hatta No. 10",
+    "time_open": "10:00 - 20:00"
+  },
+  "menus": [
+    {
+      "_id": 1,
+      "menuName": "Ayam Goreng",
+      "rating": 4,
+      "level": 4,
+      "harga": 10000,
+      "quantity": 1
+    }
+  ],
+  "totalHarga": 10000,
+  "_class": "com.orderapp.foodorder.model.mongoDb.CartMongo"
+}]
